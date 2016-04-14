@@ -1,5 +1,8 @@
 @import 'utils/reset.css';
 @import 'utils/colors.css';
+@import 'utils/typography.css';
+@import 'utils/media.css';
+@import 'components/buttons.css';
 @import 'components/header.css';
 
 html, body {
@@ -8,9 +11,28 @@ html, body {
 }
 
 body {
-  background-color: var(--colorPrimary);
+  background-color: var(--colorGrayDark);
   color: var(--colorText);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-size: var(--fontSize);
+
+  @media (--screen-large) {
+    background-color: color(var(--colorPrimary) blackness(80%));
+  }
+}
+
+.component {
+  padding: 15px 25px;
+  margin: 20px;
+  border-radius: 5px;
+  background-color: var(--colorPrimary);
+  font-family: var(--fontFamily);
+}
+
+h1 {
+  font-weight: 200;
+  font-size: calc(var(--fontSize) * 2);
 }

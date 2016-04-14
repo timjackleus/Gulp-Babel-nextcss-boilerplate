@@ -18,6 +18,7 @@ const config = require('./gulp.config.json'),
       notify = require('gulp-notify'),
       postcss = require('gulp-postcss'),
       cssimport = require('postcss-easy-import'),
+      cssnested = require('postcss-nested'),
       mqpacker = require('css-mqpacker'),
       cssnano = require('gulp-cssnano'),
       rename = require("gulp-rename"),
@@ -55,6 +56,7 @@ gulp.task('styles', () => {
     .pipe(sourcemaps.init())
     .pipe(postcss([
       cssimport,
+      cssnested,
       mqpacker,
       cssnext
     ]))

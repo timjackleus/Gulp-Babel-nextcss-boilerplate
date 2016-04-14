@@ -1,0 +1,11 @@
+@custom-selector :--hover :hover, :active;
+
+a {
+  color: var(--colorText) !important;
+  text-decoration: none;
+
+  & :--hover {
+    color: color(var(--colorText) blackness(80%));
+    filter: blur(2px);
+  }
+}
