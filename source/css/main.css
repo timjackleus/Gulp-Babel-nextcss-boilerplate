@@ -1,0 +1,16 @@
+@import 'utils/reset.css';
+@import 'utils/colors.css';
+@import 'components/header.css';
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--colorPrimary);
+  color: var(--colorText);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
