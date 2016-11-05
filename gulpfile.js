@@ -1,28 +1,24 @@
-'use strict';
-
 const config = require('./gulp.config.json'),
-      gulp = require('gulp'),
-      gulpif = require('gulp-if'),
-      fileinclude = require('gulp-file-include'),
-      concat = require('gulp-concat'),
-      source = require('vinyl-source-stream'),
-      stream = require('event-stream'),
-      watchify = require('watchify'),
-      browserify = require('browserify'),
-      buffer = require('vinyl-buffer'),
-      babel = require('babelify'),
-      uglify = require('gulp-uglify'),
-      size = require('gulp-size'),
-      sourcemaps = require('gulp-sourcemaps'),
-      cssnext = require('postcss-cssnext'),
-      notify = require('gulp-notify'),
-      postcss = require('gulp-postcss'),
-      cssimport = require('postcss-easy-import'),
-      cssnested = require('postcss-nested'),
-      mqpacker = require('css-mqpacker'),
-      cssnano = require('gulp-cssnano'),
-      rename = require("gulp-rename"),
-      browserSync = require('browser-sync').create();
+  gulp = require('gulp'),
+  gulpif = require('gulp-if'),
+  fileinclude = require('gulp-file-include'),
+  source = require('vinyl-source-stream'),
+  stream = require('event-stream'),
+  buffer = require('vinyl-buffer'),
+  babel = require('gulp-babel'),
+  rollup = require('rollup-stream'),
+  uglify = require('gulp-uglify'),
+  size = require('gulp-size'),
+  sourcemaps = require('gulp-sourcemaps'),
+  cssnext = require('postcss-cssnext'),
+  notify = require('gulp-notify'),
+  postcss = require('gulp-postcss'),
+  cssimport = require('postcss-easy-import'),
+  cssnested = require('postcss-nested'),
+  mqpacker = require('css-mqpacker'),
+  cssnano = require('gulp-cssnano'),
+  rename = require("gulp-rename"),
+  browserSync = require('browser-sync').create();
 
 let env = process.env.NODE_ENV;
 
@@ -35,6 +31,7 @@ gulp.task('browser-sync', () => {
     port: config['server-port']
   });
 });
+
 
 // Bundle all html files
 gulp.task('fileinclude', () => {
@@ -49,6 +46,7 @@ gulp.task('fileinclude', () => {
     .pipe(gulp.dest(config['target-html']))
     .pipe(browserSync.reload({stream:true}));
 });
+
 
 // Styles task
 gulp.task('styles', () => {
@@ -68,6 +66,7 @@ gulp.task('styles', () => {
     .pipe(browserSync.stream({match: '**/*.css'}));
 });
 
+
 // Watch for changes
 // css: livereload
 // JS & html: page refresh
@@ -77,40 +76,43 @@ gulp.task('watch', ['browser-sync'], () => {
   gulp.watch(config['source-all-js-files'], ['scripts']);
 });
 
+
 // Transpile ES2015 => ES5
 // Bundle js
 gulp.task('scripts', () => {
-  const modules = browserify(config['source-js'], {
-    debug: env === 'development'
+  rollup({
+    entry: config['source-js'],
+    sourceMap: true,
+    format: 'iife'
   })
-    .transform(babel, {presets: ['es2015']})
-    .bundle()
-    .on('error', notify.onError({
-      message: 'Browserify error: <%= error.message %>'
-    }))
-    .pipe(source(config['target-js']))
-    .pipe(gulp.dest('./'))
-    .pipe(size({
-      title: 'size of modules'
-    }));
-  stream.concat(modules).pipe(browserSync.reload({stream:true, once: true}));
+  .on('error', e => { console.error(`${e.stack}`) })
+  .pipe(source("scripts.js", "./source/js/"))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(babel({ presets: ['es2015'] }))
+  .pipe(rename('build/js/main.js'))
+  .pipe(sourcemaps.write("."))
+  .pipe(gulp.dest('./'))
+  .pipe(browserSync.reload({stream:true}));
 });
+
 
 // Compress JS files for production
 gulp.task('compress', function() {
-  return gulp.src(config['target-js'])
-    .pipe(uglify())
-    .on('error', notify.onError({
-      message: 'Browserify error: <%= error.message %>'
-    }))
-    .pipe(size({
-      title: 'js bundle size -->'
-    }))
-    .pipe(rename('build/js/main.min.js'))
-    .pipe(gulp.dest('./'));
+  rollup({
+    entry: config['source-js'],
+    sourceMap: true,
+    format: 'iife'
+  })
+  .pipe(source("scripts.js", "./source/js/"))
+  .pipe(buffer())
+  .pipe(babel({
+    presets: ['es2015']
+  }))
+  .pipe(rename('build/js/main.min.js'))
+  .pipe(uglify())
+  .pipe(size({ title: 'js bundle size -->' }))
+  .pipe(rename('build/js/main.min.js'))
+  .pipe(gulp.dest('./'))
+  .pipe(browserSync.reload({stream:true}));
 });
-
-// Use npm scripts instead of gulp commands. -> package.json
-gulp.task('dev', () => {gulp.start('styles', 'fileinclude', 'scripts');});
-gulp.task('build', ['styles', 'fileinclude', 'compress']);
-gulp.task('default', ['dev', 'watch']);
