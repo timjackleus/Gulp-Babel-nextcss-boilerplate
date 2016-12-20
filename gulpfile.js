@@ -89,7 +89,7 @@ gulp.task('scripts', () => {
   .pipe(source("scripts.js", "./source/js/"))
   .pipe(buffer())
   .pipe(sourcemaps.init({loadMaps: true}))
-  .pipe(babel({ presets: ['es2015'] }))
+  .pipe(babel())
   .pipe(rename('build/js/main.js'))
   .pipe(sourcemaps.write("."))
   .pipe(gulp.dest('./'))
@@ -101,7 +101,7 @@ gulp.task('scripts', () => {
 gulp.task('compress', function() {
   rollup({
     entry: config['source-js'],
-    sourceMap: true,
+    sourceMap: false,
     format: 'iife'
   })
   .pipe(source("scripts.js", "./source/js/"))
