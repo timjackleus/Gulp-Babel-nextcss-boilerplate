@@ -7,10 +7,12 @@
     "build": "NODE_ENV=production gulp styles && gulp fileinclude && gulp compress",
     "dev": "NODE_ENV=development gulp styles && gulp fileinclude && gulp scripts && gulp watch",
     "cleancss": "csscomb source/css",
-    "lintjs": "eslint source/js"
+    "lintjs": "eslint source/js",
+    "test": "node test/index.js"
   },
   "pre-commit": [
-    "lintjs"
+    "lintjs",
+    "test"
   ],
   "devDependencies": {
     "babel": "^6.23.0",
@@ -37,7 +39,9 @@
     "postcss-cssnext": "^2.10.0",
     "postcss-easy-import": "^2.0.0",
     "postcss-nested": "^1.0.0",
+    "rollup-plugin-commonjs": "^8.0.2",
     "rollup-stream": "^1.19.0",
+    "tape": "^4.6.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
@@ -45,7 +49,10 @@
     "babel-runtime": "^6.23.0",
     "eslint": "^3.19.0",
     "fastclick": "^1.0.6",
-    "git-validate": "^2.2.2"
+    "fs": "0.0.1-security",
+    "git-validate": "^2.2.2",
+    "path": "^0.12.7",
+    "reify": "^0.6.8"
   },
   "repository": {
     "type": "git",

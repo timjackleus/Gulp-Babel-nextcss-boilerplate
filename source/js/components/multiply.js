@@ -2,4 +2,4 @@ const multiply = (x) => {
   return x * x;
 };
 
-export default multiply;
+module.exports = multiply;
